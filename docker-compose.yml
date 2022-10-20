@@ -1,0 +1,7 @@
+services:
+  app:
+    container_name: projet-octobre
+    restart: always
+    build: .
+    ports: 
+    - '9020:3000'
