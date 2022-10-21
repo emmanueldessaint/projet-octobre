@@ -1,7 +1,8 @@
 services:
   app:
-    container_name: projet-octobre
+    container_name: app
     restart: always
     build: .
+    working_dir: /app
     ports: 
     - '9020:3000'
