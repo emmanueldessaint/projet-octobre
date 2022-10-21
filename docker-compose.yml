@@ -5,5 +5,5 @@ services:
     build: .
     working_dir: /app
     ports: 
-    - '9020:3000'
+    - '9020:4000'
     command: npm start
