@@ -1,9 +1,17 @@
 const express = require('express');
+var bodyParser = require('body-parser')
 const app = express();
 const mongoose = require('mongoose');
 const Student = require('./models/Student');
+const Materiel = require('./models/Materiel');
+var jsonParser = bodyParser.json()
+var urlencodedParser = bodyParser.urlencoded({ extended: false })
 
-mongoose.connect('mongodb+srv://Emmanuel:Emmanuel199627@cluster0.44jw3e7.mongodb.net/test?retryWrites=true&w=majority',
+app.use(express.json());             // for application/json
+// app.use(express.urlencoded());
+
+mongoose.connect('mongodb+srv://Emmanuel:Emmanuel199627@cluster0.44jw3e7.mongodb.net/test',
+// mongoose.connect('mongodb+srv://Emmanuel:Emmanuel199627@cluster0.44jw3e7.mongodb.net/test?retryWrites=true&w=majority',
     {
         useNewUrlParser: true,
         useUnifiedTopology: true
@@ -18,52 +26,32 @@ app.use((req, res, next) => {
     next();
 });
 
-
-// app.use((req, res, next) => {
-//     console.log('Requête reçue !');
-//     next();
-// });
-
-// app.use('/api/stuff', (req, res, next) => {
-//     res.status(201);
-//     next();
-// });
-
-app.post('/api/test', (req, res, next) => {
-    console.log(req.body)
-    res.status(201).json({ message : 'message du back'})
+app.post('/api/createStudent', jsonParser, function (req, res) {
     // delete req.body._id;
-    // const thing = new Student({
-    //     ...req.body
-    // });
-    // thing.save()
-    //     .then(() => res.status(201).json({ message: 'Objet enregistré !' }))
-    //     .catch(error => res.status(400).json({ error }));
-});
+    console.log(req.body)
+    const student = new Student({
+        ...req.body
+    });
+    student.save()
+        .then(() => res.status(201).json({ message: 'Objet enregistré !' }))
+        .catch(error => res.status(400).json({ error }));
+})
 
-app.use('/api/stuff', (req, res, next) => {
-    const stuff = [
-        {
-            _id: 'oeihfzeoi',
-            title: 'Mon premier objet',
-            description: 'Les infos de mon premier objet',
-            imageUrl: 'https://cdn.pixabay.com/photo/2019/06/11/18/56/camera-4267692_1280.jpg',
-            price: 4900,
-            userId: 'qsomihvqios',
-        },
-        {
-            _id: 'oeihfzeomoihi',
-            title: 'Mon deuxième objet',
-            description: 'Les infos de mon deuxième objet',
-            imageUrl: 'https://cdn.pixabay.com/photo/2019/06/11/18/56/camera-4267692_1280.jpg',
-            price: 2900,
-            userId: 'qsomihvqios',
-        },
-    ];
-    res.status(200).json(stuff);
-    // Student.find()
-    //   .then(things => res.status(200).json(things))
-    //   .catch(error => res.status(400).json({ error }));
-});
+app.post('/api/addMateriel', jsonParser, function (req, res) {
+    // delete req.body._id;
+    console.log(req.body)
+    const materiel = new Materiel({
+        ...req.body
+    });
+    materiel.save()
+        .then(() => res.status(201).json({ message: 'Matériel enregistré !' }))
+        .catch(error => res.status(400).json({ error }));
+})
+
+app.use('/api/getAllStudents', function (req, res) {
+    Student.find()
+        .then(students => res.status(200).json(students))
+        .catch(error => res.status(400).json({ error }));
+})
 
 module.exports = app;
