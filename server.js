@@ -1,6 +1,8 @@
 const http = require('http');
 const app = require('./app');
 
+console.log('step server 0')
+
 const normalizePort = val => {
   const port = parseInt(val, 10);
 
@@ -12,7 +14,7 @@ const normalizePort = val => {
   }
   return false;
 };
-const port = normalizePort(process.env.PORT || '3000');
+const port = normalizePort(process.env.PORT || '8000');
 app.set('port', port);
 
 const errorHandler = error => {
@@ -45,3 +47,21 @@ server.on('listening', () => {
 });
 
 server.listen(port);
+
+// 'use strict';
+
+// const express = require('express');
+
+// // Constants
+// const PORT = 3000;
+// const HOST = '0.0.0.0';
+
+// // App
+// const app = express();
+// app.get('/', (req, res) => {
+//   res.send('Hello World');
+// });
+
+// app.listen(PORT, HOST, () => {
+//   console.log(`Running on http://${HOST}:${PORT}`);
+// });
