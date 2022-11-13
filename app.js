@@ -64,39 +64,47 @@ app.use('/api/getAllEmprunts', function (req, res) {
 })
 
 app.post('/api/addEmprunt', jsonParser, function (req, res) {
-    console.log(req.body)
+    // console.log(req.body)
+    var student = {};
     const emprunt = new Emprunt({
         ...req.body
     });
     emprunt.save()
         .then(() => res.status(201).json({ message: 'Emprunt enregistré !' }))
         .catch(error => res.status(400).json({ error }));
-    // db.collection('students').findOne({ id: req.body.id_etudiant })
-    //     .then(res =>
-
+    db.collection('students').findOne({ id: req.body.id_etudiant })
+        .then(res => {
+            student = res;
+            console.log(res.mail)
             async function main() {
                 // Generate test SMTP service account from ethereal.email
                 // Only needed if you don't have a real mail account for testing
-                let testAccount = await nodemailer.createTestAccount();
+                // let testAccount = await nodemailer.createTestAccount();
 
                 // create reusable transporter object using the default SMTP transport
                 let transporter = nodemailer.createTransport({
-                    host: "smtp.hotmail.fr",
-                    port: 587,
-                    secure: false, // true for 465, false for other ports
+                    Service: "Hotmail",
                     auth: {
                         user: "mat_et_manu@hotmail.fr", // generated ethereal user
-                        pass: testAccount.pass, // generated ethereal password
+                        pass: "Rumutcho270?", // generated ethereal password
                     },
+                    // host: "hotmail.fr",
+                    // port: 587,
+                    // secure: false, // true for 465, false for other ports
+                    // auth: {
+                    //     user: "mat_et_manu@hotmail.fr", // generated ethereal user
+                    //     pass: "Rumutcho270?", // generated ethereal password
+                    // },
                 });
 
                 // send mail with defined transport object
                 let info = await transporter.sendMail({
                     from: '"Emmanuel" <foo@example.com>', // sender address
-                    to: "basajov391@hoxds.com", // list of receivers
-                    subject: "Hello ✔", // Subject line
-                    text: "Hello world?", // plain text body
-                    html: "<b>Hello world?</b>", // html body
+                    to: res.mail, // list of receivers
+                    // to: "xolav39705@sopulit.com", // list of receivers
+                    subject: "Emprunt de matériel", // Subject line
+                    text: "Emprunt de matériel", // plain text body
+                    html: `<b>Bonjour ${res.prenom}, vous venez d'emprunter du matériel à la NWS.</b>`, // html body
                 });
 
                 console.log("Message sent: %s", info.messageId);
@@ -110,8 +118,8 @@ app.post('/api/addEmprunt', jsonParser, function (req, res) {
             main().catch(console.error);
 
             // console.log(res.mail)
-        // )
-        // .catch(error => res.status(400).json({ error }));
+        })
+    .catch(error => res.status(400).json({ error }));
 })
 
 app.delete('/api/deleteEmprunt/:id', (req, res, next) => {
