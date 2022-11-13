@@ -7,6 +7,7 @@ const Student = require('./models/Student');
 const Materiel = require('./models/Materiel');
 const Emprunt = require('./models/Emprunt');
 var jsonParser = bodyParser.json();
+require('dotenv').config();
 
 var mongodb = require('mongodb');
 var MongoClient = mongodb.MongoClient;
@@ -63,63 +64,77 @@ app.use('/api/getAllEmprunts', function (req, res) {
         .catch(error => res.status(400).json({ error }));
 })
 
+app.post('/api/reminderEmprunt', jsonParser, function (req, res) {
+    var student = {};
+    console.log(req.body)
+
+    db.collection('students').findOne({ id: req.body.id_etudiant })
+        .then(res => {
+            student = res;
+            console.log(req.body.date_rendu)
+
+            var nodeoutlook = require('nodejs-nodemailer-outlook')
+            nodeoutlook.sendEmail({
+                auth: {
+                    user: "mat_et_manu@hotmail.fr",
+                    pass: process.env.PASSWORD
+                },
+                from: 'mat_et_manu@hotmail.fr',
+                to: res.mail,
+                subject: 'Rappel emprunt de matériel NWS',
+                html: `Bonjour ${res.prenom}, nous vous rappelons que vous avez emprunter du matériel à la NWS. Vous devez le rendre au plus tard le ${req.body.date_rendu.charAt(8)}${req.body.date_rendu.charAt(9)}/${req.body.date_rendu.charAt(5)}${req.body.date_rendu.charAt(6)}/${req.body.date_rendu.charAt(0)}${req.body.date_rendu.charAt(1)}${req.body.date_rendu.charAt(2)}${req.body.date_rendu.charAt(3)}.`,
+                // html: `Bonjour ${res.prenom}, vous venez d'emprunter un(e) ${materielName} à la NWS. Vous devez rendre le matériel au plus tard le ${req.body.date_rendu.charAt(8)}${req.body.date_rendu.charAt(9)}/${req.body.date_rendu.charAt(5)}${req.body.date_rendu.charAt(6)}/${req.body.date_rendu.charAt(0)}${req.body.date_rendu.charAt(1)}${req.body.date_rendu.charAt(2)}${req.body.date_rendu.charAt(3)}.`,
+                text: 'This is text version!',
+                replyTo: res.mail,
+                onError: (e) => console.log(e),
+                onSuccess: (i) => console.log(i)
+            }
+            );
+        })
+        .catch(error => res.status(400).json({ error }));
+})
+
 app.post('/api/addEmprunt', jsonParser, function (req, res) {
     // console.log(req.body)
     var student = {};
+    var materielName = '';
     const emprunt = new Emprunt({
         ...req.body
     });
     emprunt.save()
         .then(() => res.status(201).json({ message: 'Emprunt enregistré !' }))
         .catch(error => res.status(400).json({ error }));
+    Materiel.findOne({ id: req.body.id_materiel })
+        .then(res2 => {
+            materielName = res2.nom
+            console.log(materielName)
+        })
+        .catch(error => res.status(400).json({ error }));
+
     db.collection('students').findOne({ id: req.body.id_etudiant })
         .then(res => {
             student = res;
-            console.log(res.mail)
-            async function main() {
-                // Generate test SMTP service account from ethereal.email
-                // Only needed if you don't have a real mail account for testing
-                // let testAccount = await nodemailer.createTestAccount();
+            console.log(req.body.date_rendu)
 
-                // create reusable transporter object using the default SMTP transport
-                let transporter = nodemailer.createTransport({
-                    Service: "Hotmail",
-                    auth: {
-                        user: "mat_et_manu@hotmail.fr", // generated ethereal user
-                        pass: "Rumutcho270?", // generated ethereal password
-                    },
-                    // host: "hotmail.fr",
-                    // port: 587,
-                    // secure: false, // true for 465, false for other ports
-                    // auth: {
-                    //     user: "mat_et_manu@hotmail.fr", // generated ethereal user
-                    //     pass: "Rumutcho270?", // generated ethereal password
-                    // },
-                });
-
-                // send mail with defined transport object
-                let info = await transporter.sendMail({
-                    from: '"Emmanuel" <foo@example.com>', // sender address
-                    to: res.mail, // list of receivers
-                    // to: "xolav39705@sopulit.com", // list of receivers
-                    subject: "Emprunt de matériel", // Subject line
-                    text: "Emprunt de matériel", // plain text body
-                    html: `<b>Bonjour ${res.prenom}, vous venez d'emprunter du matériel à la NWS.</b>`, // html body
-                });
-
-                console.log("Message sent: %s", info.messageId);
-                // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-
-                // Preview only available when sending through an Ethereal account
-                console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-                // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+            var nodeoutlook = require('nodejs-nodemailer-outlook')
+            nodeoutlook.sendEmail({
+                auth: {
+                    user: "mat_et_manu@hotmail.fr",
+                    pass: process.env.PASSWORD
+                },
+                from: 'mat_et_manu@hotmail.fr',
+                to: res.mail,
+                subject: 'Emprunt de matériel NWS',
+                html: `Bonjour ${res.prenom}, vous venez d'emprunter du matériel à la NWS. Vous devez rendre le matériel au plus tard le ${req.body.date_rendu.charAt(8)}${req.body.date_rendu.charAt(9)}/${req.body.date_rendu.charAt(5)}${req.body.date_rendu.charAt(6)}/${req.body.date_rendu.charAt(0)}${req.body.date_rendu.charAt(1)}${req.body.date_rendu.charAt(2)}${req.body.date_rendu.charAt(3)}.`,
+                // html: `Bonjour ${res.prenom}, vous venez d'emprunter un(e) ${materielName} à la NWS. Vous devez rendre le matériel au plus tard le ${req.body.date_rendu.charAt(8)}${req.body.date_rendu.charAt(9)}/${req.body.date_rendu.charAt(5)}${req.body.date_rendu.charAt(6)}/${req.body.date_rendu.charAt(0)}${req.body.date_rendu.charAt(1)}${req.body.date_rendu.charAt(2)}${req.body.date_rendu.charAt(3)}.`,
+                text: 'This is text version!',
+                replyTo: res.mail,
+                onError: (e) => console.log(e),
+                onSuccess: (i) => console.log(i)
             }
-
-            main().catch(console.error);
-
-            // console.log(res.mail)
+            );
         })
-    .catch(error => res.status(400).json({ error }));
+        .catch(error => res.status(400).json({ error }));
 })
 
 app.delete('/api/deleteEmprunt/:id', (req, res, next) => {
