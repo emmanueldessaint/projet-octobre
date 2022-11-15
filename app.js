@@ -71,7 +71,7 @@ app.post('/api/reminderEmprunt', jsonParser, function (req, res) {
     db.collection('students').findOne({ id: req.body.id_etudiant })
         .then(res => {
             student = res;
-            console.log(req.body.date_rendu)
+            console.log(req.body)
 
             var nodeoutlook = require('nodejs-nodemailer-outlook')
             nodeoutlook.sendEmail({
@@ -83,7 +83,6 @@ app.post('/api/reminderEmprunt', jsonParser, function (req, res) {
                 to: res.mail,
                 subject: 'Rappel emprunt de matériel NWS',
                 html: `Bonjour ${res.prenom}, nous vous rappelons que vous avez emprunter du matériel à la NWS. Vous devez le rendre au plus tard le ${req.body.date_rendu.charAt(8)}${req.body.date_rendu.charAt(9)}/${req.body.date_rendu.charAt(5)}${req.body.date_rendu.charAt(6)}/${req.body.date_rendu.charAt(0)}${req.body.date_rendu.charAt(1)}${req.body.date_rendu.charAt(2)}${req.body.date_rendu.charAt(3)}.`,
-                // html: `Bonjour ${res.prenom}, vous venez d'emprunter un(e) ${materielName} à la NWS. Vous devez rendre le matériel au plus tard le ${req.body.date_rendu.charAt(8)}${req.body.date_rendu.charAt(9)}/${req.body.date_rendu.charAt(5)}${req.body.date_rendu.charAt(6)}/${req.body.date_rendu.charAt(0)}${req.body.date_rendu.charAt(1)}${req.body.date_rendu.charAt(2)}${req.body.date_rendu.charAt(3)}.`,
                 text: 'This is text version!',
                 replyTo: res.mail,
                 onError: (e) => console.log(e),
@@ -108,13 +107,10 @@ app.post('/api/addEmprunt', jsonParser, function (req, res) {
         .then(res2 => {
             materielName = res2.nom
             console.log(materielName)
-        })
-        .catch(error => res.status(400).json({ error }));
-
-    db.collection('students').findOne({ id: req.body.id_etudiant })
+            db.collection('students').findOne({ id: req.body.id_etudiant })
         .then(res => {
             student = res;
-            console.log(req.body.date_rendu)
+            console.log(materielName)
 
             var nodeoutlook = require('nodejs-nodemailer-outlook')
             nodeoutlook.sendEmail({
@@ -125,14 +121,15 @@ app.post('/api/addEmprunt', jsonParser, function (req, res) {
                 from: 'mat_et_manu@hotmail.fr',
                 to: res.mail,
                 subject: 'Emprunt de matériel NWS',
-                html: `Bonjour ${res.prenom}, vous venez d'emprunter du matériel à la NWS. Vous devez rendre le matériel au plus tard le ${req.body.date_rendu.charAt(8)}${req.body.date_rendu.charAt(9)}/${req.body.date_rendu.charAt(5)}${req.body.date_rendu.charAt(6)}/${req.body.date_rendu.charAt(0)}${req.body.date_rendu.charAt(1)}${req.body.date_rendu.charAt(2)}${req.body.date_rendu.charAt(3)}.`,
-                // html: `Bonjour ${res.prenom}, vous venez d'emprunter un(e) ${materielName} à la NWS. Vous devez rendre le matériel au plus tard le ${req.body.date_rendu.charAt(8)}${req.body.date_rendu.charAt(9)}/${req.body.date_rendu.charAt(5)}${req.body.date_rendu.charAt(6)}/${req.body.date_rendu.charAt(0)}${req.body.date_rendu.charAt(1)}${req.body.date_rendu.charAt(2)}${req.body.date_rendu.charAt(3)}.`,
+                html: `Bonjour ${res.prenom}, vous venez d'emprunter un(e) ${materielName} à la NWS le ${req.body.date_emprunt.charAt(8)}${req.body.date_emprunt.charAt(9)}/${req.body.date_emprunt.charAt(5)}${req.body.date_emprunt.charAt(6)}/${req.body.date_emprunt.charAt(0)}${req.body.date_emprunt.charAt(1)}${req.body.date_emprunt.charAt(2)}${req.body.date_emprunt.charAt(3)}. Vous devez rendre le matériel au plus tard le ${req.body.date_rendu.charAt(8)}${req.body.date_rendu.charAt(9)}/${req.body.date_rendu.charAt(5)}${req.body.date_rendu.charAt(6)}/${req.body.date_rendu.charAt(0)}${req.body.date_rendu.charAt(1)}${req.body.date_rendu.charAt(2)}${req.body.date_rendu.charAt(3)}.`,
                 text: 'This is text version!',
                 replyTo: res.mail,
                 onError: (e) => console.log(e),
                 onSuccess: (i) => console.log(i)
             }
             );
+        })
+        .catch(error => res.status(400).json({ error }));
         })
         .catch(error => res.status(400).json({ error }));
 })
