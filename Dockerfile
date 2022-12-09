@@ -1,6 +1,8 @@
 FROM node:16 AS nws-back
 
-# RUN npm install
+WORKDIR /usr/app
+COPY ./ /usr/app
+RUN npm install
 
 EXPOSE 8000
 
