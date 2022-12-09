@@ -1,16 +1,6 @@
-FROM node:18
+FROM node:18 AS nws-back
 
-RUN cd /tmp && \
-    git clone https://github.com/emmanueldessaint/projet-octobre.git backend
-
-WORKDIR /tmp/backend
-
-RUN touch .env && \
-    echo "PASSWORD=Rumutcho270?" >> .env
-
-RUN cd /tmp/backend && \
-    npm install && \
-    npm install -g nodemon
+RUN npm install && npm install -g nodemon
 
 EXPOSE 8000
 
