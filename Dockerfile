@@ -1,7 +1,7 @@
 FROM node:16 AS nws-back
 
-RUN npm install && npm install -g nodemon
+RUN npm install
 
 EXPOSE 8000
 
-ENTRYPOINT ["nodemon", "server.js"]
+ENTRYPOINT ["node", "server.js"]
