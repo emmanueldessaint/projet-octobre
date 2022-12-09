@@ -1,6 +1,6 @@
 FROM node:16 AS nws-back
 
-RUN npm install
+# RUN npm install
 
 EXPOSE 8000
 
